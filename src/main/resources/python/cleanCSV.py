@@ -1,10 +1,11 @@
 import re
 
 """
-Python script used to clean the csv files for Spark processing,
-due to Spark failing to read the original files
+Python script used to clean the data.csv file for Spark processing,
+due to Spark failing to read the original one
 """
 
+# list_regex -> each regex field is a comma separated value for the final csv.
 list_regex = [
     "[0-9]*[.]?[0-9]*(e-[0-9]*)*,?",
     "(\"[[].*?[]]\",?)|([[]'.*?'[]],?)",

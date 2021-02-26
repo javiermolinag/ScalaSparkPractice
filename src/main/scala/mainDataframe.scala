@@ -1,7 +1,7 @@
-import dataframe.ProcDataFrame
+import dataframe.ProcSpotifyDataFrame
 import utils.initSpark
 
 object mainDataframe extends initSpark{
-  val procDataFrame: ProcDataFrame = new ProcDataFrame(spark)
+  val procDataFrame: ProcSpotifyDataFrame = new ProcSpotifyDataFrame(spark)
   procDataFrame.runProcess()
 }

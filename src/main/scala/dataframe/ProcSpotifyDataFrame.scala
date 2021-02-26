@@ -8,7 +8,7 @@ import org.apache.spark.sql.functions.{avg, col, max, min, rank, stddev, when}
 
 import scala.collection.mutable
 
-class ProcDataFrame(spark: SparkSession){
+class ProcSpotifyDataFrame(spark: SparkSession){
 
   private val readSpark = new ReadProcess(spark)
 
@@ -20,6 +20,7 @@ class ProcDataFrame(spark: SparkSession){
     todo: Rule1
       Get DF with the mean, max, min, stddev and avg of "valence" column,
       Group results by "year"
+      Use: groupBy and agg functions
   */
   def rule1(df: DataFrame): DataFrame = {
     df
@@ -34,7 +35,8 @@ class ProcDataFrame(spark: SparkSession){
 
   /*
   todo: Rule2
-    is there any relation between "valence", "tempo", "popularity" and "liveness"? (use corr)
+    is there any relation between "valence", "tempo", "popularity" and "liveness"?
+    Use: stat.corr
   */
   def rule2(df: DataFrame): DataFrame = {
     val corrSeq = Seq(
@@ -72,6 +74,7 @@ class ProcDataFrame(spark: SparkSession){
   /*
   todo: Rule3
     add a boolean column called "i_need_it" which is given by the valence column > 0.85
+    Use: when
   */
   def rule3(df: DataFrame): DataFrame = {
     val condition: Column = col(Constants.ValenceColumn) > Constants.ZeroDotEightFiveNumber
@@ -84,6 +87,7 @@ class ProcDataFrame(spark: SparkSession){
   /*
   todo: Rule4
     show top 20 artists with the most popularity average songs (asc order)
+    Use: groupBy, agg functions, sort and limit
   */
   def rule4(df: DataFrame): DataFrame = {
     df
@@ -100,6 +104,7 @@ class ProcDataFrame(spark: SparkSession){
   todo: Rule5
     get the top 5 danceability songs for each artist,
     add a new column named "to_dance"
+    Use: when, window, partitionBy orderBy
   */
   def rule5(df: DataFrame): DataFrame = {
     val window: WindowSpec = Window
@@ -137,8 +142,6 @@ class ProcDataFrame(spark: SparkSession){
     dataFlow.put(Constants.Rule5,rule5(dataFlow(Constants.Rule3)))
     println("Rule 5 result")
     dataFlow(Constants.Rule5).filter(col(Constants.ToDanceColumn)).show()
-
-
   }
 
 

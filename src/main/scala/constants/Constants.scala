@@ -1,18 +1,26 @@
 package constants
 
 object Constants {
-  val FileNameData: String = "spotify/data_.csv"
+  val SpotifyDataPath: String = "/spotify/data_.csv"
+  val MovieLensMoviePath: String = "/movie-lens/movie.csv"
+  val MovieLensRatingPath: String = "/movie-lens/rating.csv"
+  val MovieLensTagPath: String = "/movie-lens/tag.csv"
+
   val Rule1: String = "Rule1"
   val Rule2: String = "Rule2"
   val Rule3: String = "Rule3"
   val Rule4: String = "Rule4"
   val Rule5: String = "Rule5"
 
-  val DataDF: String = "dataDf"
+  val SpotifyDataDF: String = "spotifyDataDf"
+  val MovieLensMovieDf: String = "movieLensMovieDf"
+  val MovieLensRatingDf: String = "movieLensRatingDf"
+  val MovieLensTagDf: String = "movieLensTagDf"
 
   val ZeroDotEightFiveNumber: Double = 0.85
   val TwentyNUmber: Int = 20
   val FiveNumber: Int = 5
+  val ZeroNumber: Int = 0
   val TrueBoolean: Boolean = true
   val FalseBoolean: Boolean = false
 
@@ -33,4 +41,8 @@ object Constants {
   val ValenceColumn: String = "valence"
   val ArtistsColumn: String = "artists"
   val DanceabilityColumn: String = "danceability"
+
+  val TitleColumn: String = "title"
+  val GenresColumn: String = "genres"
+  val MovieIdColumn: String = "movieId"
 }

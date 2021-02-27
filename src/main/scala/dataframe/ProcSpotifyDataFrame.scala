@@ -1,6 +1,6 @@
 package dataframe
 
-import common.Schemas.dataSchema
+import common.Schemas.dataSpotifySchema
 import constants.Constants
 import org.apache.spark.sql.expressions.{Window, WindowSpec}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -13,7 +13,7 @@ class ProcSpotifyDataFrame(spark: SparkSession){
   private val readSpark = new ReadProcess(spark)
 
   val dataFlow: mutable.Map[String, DataFrame] = mutable.Map(
-    Constants.DataDF -> readSpark.readCSV(Constants.FileNameData,dataSchema)
+    Constants.SpotifyDataDF -> readSpark.readCSV(Constants.SpotifyDataPath,dataSpotifySchema)
   )
 
   /*
@@ -120,18 +120,18 @@ class ProcSpotifyDataFrame(spark: SparkSession){
   }
 
   def runProcess(): Unit = {
-    dataFlow(Constants.DataDF).printSchema()
-    dataFlow(Constants.DataDF).show()
+    dataFlow(Constants.SpotifyDataDF).printSchema()
+    dataFlow(Constants.SpotifyDataDF).show()
 
-    dataFlow.put(Constants.Rule1,rule1(dataFlow(Constants.DataDF)))
+    dataFlow.put(Constants.Rule1,rule1(dataFlow(Constants.SpotifyDataDF)))
     println("Rule 1 result")
     dataFlow(Constants.Rule1).orderBy(Constants.YearColumn).show()
 
-    dataFlow.put(Constants.Rule2,rule2(dataFlow(Constants.DataDF)))
+    dataFlow.put(Constants.Rule2,rule2(dataFlow(Constants.SpotifyDataDF)))
     println("Rule 2 result")
     dataFlow(Constants.Rule2).show()
 
-    dataFlow.put(Constants.Rule3,rule3(dataFlow(Constants.DataDF)))
+    dataFlow.put(Constants.Rule3,rule3(dataFlow(Constants.SpotifyDataDF)))
     println("Rule 3 result")
     dataFlow(Constants.Rule3).filter(col(Constants.INeedItColumn)).orderBy(Constants.YearColumn).show()
 

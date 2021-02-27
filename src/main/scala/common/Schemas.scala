@@ -4,7 +4,7 @@ import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType, StringType
 
 object Schemas {
 
-  val dataSchema: StructType = StructType(Array(
+  val dataSpotifySchema: StructType = StructType(Array(
     StructField("acousticness",DoubleType),
     StructField("artists",StringType),
     StructField("danceability",DoubleType),
@@ -25,5 +25,26 @@ object Schemas {
     StructField("valence",DoubleType),
     StructField("year",StringType)
   ))
+
+  val movieMovieLensSchema : StructType = StructType(Array(
+    StructField("movieId",StringType),
+    StructField("title",StringType),
+    StructField("genres",StringType)
+  ))
+
+  val ratingMovieLensSchema : StructType = StructType(Array(
+    StructField("userId",LongType),
+    StructField("movieId",StringType),
+    StructField("rating",StringType),
+    StructField("timestamp",StringType)
+  ))
+
+  val tagMovieLensSchema : StructType = StructType(Array(
+    StructField("userId",LongType),
+    StructField("movieId",LongType),
+    StructField("tag",StringType),
+    StructField("timestamp",StringType)
+  ))
+
 
 }

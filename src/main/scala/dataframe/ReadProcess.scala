@@ -11,7 +11,6 @@ class ReadProcess(spark: SparkSession) {
       .option("header","true")
       .option("sep",",")
       .option("mode", "failFast") // dropMalformed, permissive (default) failFast
-      .option("badRecordsPath", "src/main/resources/data/deleted")
       .schema(schema)
       .load(s"src/main/resources/data/csv/$name")
     df

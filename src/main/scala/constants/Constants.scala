@@ -1,7 +1,7 @@
 package constants
 
 object Constants {
-  val FileNameData: String = "data_.csv"
+  val FileNameData: String = "spotify/data_.csv"
   val Rule1: String = "Rule1"
   val Rule2: String = "Rule2"
   val Rule3: String = "Rule3"

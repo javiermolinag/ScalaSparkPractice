@@ -20,7 +20,6 @@ object Constants {
   val RuleN1: String = "RuleN1"
   val RuleN2: String = "RuleN2"
   val RuleN3: String = "RuleN3"
-  val RuleN4: String = "RuleN4"
 
   val SpotifyDataDF: String = "spotifyDataDf"
   val MovieLensMovieDf: String = "movieLensMovieDf"
@@ -58,6 +57,10 @@ object Constants {
   val GenresColumn: String = "genres"
   val MovieIdColumn: String = "movieId"
   val RatingColumn: String = "rating"
+  val UserIdColumn: String = "userId"
+  val TagColumn: String = "tag"
 
   val AvgRatingColumn: String = "avg_rating"
+  val CountMovies: String = "count_movies"
+  val CountUsers: String = "count_users"
 }

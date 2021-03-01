@@ -2,7 +2,7 @@ package dataframe
 
 import common.Schemas.{movieMovieLensSchema, ratingMovieLensSchema, tagMovieLensSchema}
 import constants.Constants
-import org.apache.spark.sql.functions.{col, explode, avg, ltrim, regexp_extract, rtrim, split, substring_index, sum}
+import org.apache.spark.sql.functions.{avg, col, collect_set, count, explode, lower, ltrim, regexp_extract, rtrim, split, substring_index, sum}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 import scala.collection.mutable
@@ -153,7 +153,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     In order to make this, multiplies the "genres count" (obtained in Rule 4) and the "weight of each genre" obtained in Rule 7,
     after that, sum all genres columns and divide the result by the rating column, resulted column will be called "recommendation_value".
     Finally, filter the top 50 recommendations, the final data frame should contains the columns "title" and "recommendation"
-    Use: Broadcast
+    Use: Broadcast, groupBy, agg, filter, map, reduce, join, na, drop
   */
   def rule8(df1: DataFrame, df2: DataFrame, df3: DataFrame, df4: DataFrame): DataFrame = {
     // https://www.kaggle.com/rabiaakt/recommender-systems
@@ -209,22 +209,53 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
   /*
   todo: Rule n1
     how many movies have seen each user?
+    Use: groupBy, agg, orderBy
   */
+  def ruleN1(df: DataFrame): DataFrame = {
+    df
+      .groupBy(Constants.UserIdColumn)
+      .agg(
+        count(col(Constants.RatingColumn)).as(Constants.CountMovies)
+      )
+      .orderBy(col(Constants.CountMovies).desc_nulls_first)
+  }
 
   /*
   todo: Rule n2
-    show the avg, stddev, max and min "rating" (given by all users) of each movie,
+    show the avg "rating" (given by all users) of each movie
+    Use: groupBy, agg, join, na, orderBy
   */
-
-  /*
-  todo: Rule n3
-    list the top 50 movies using the avg of "rating"
-  */
+  def ruleN2(df1: DataFrame,df2: DataFrame): DataFrame = {
+    df1
+      .groupBy(Constants.MovieIdColumn)
+      .agg(
+        avg(col(Constants.RatingColumn)).as(Constants.AvgRatingColumn),
+        count(col(Constants.RatingColumn)).as(Constants.CountUsers)
+      )
+      .join(df2, Seq(Constants.MovieIdColumn),Constants.OuterJoin)
+      .na
+      .fill(Map(
+        Constants.AvgRatingColumn -> 0
+      ))
+      .orderBy(
+        col(Constants.AvgRatingColumn).desc_nulls_first,
+        col(Constants.CountUsers).desc_nulls_first
+      )
+  }
 
   /*
   todo: Rule n4
-    Show all different tags (list of strings) for each movie in a column called "tags"
+    Show all different tags (array of strings) for each movie in a column called "tag"
+    Use: groupBy, agg, collect_set, lower, join
   */
+  def ruleN3(df1: DataFrame, df2: DataFrame): DataFrame = {
+    df1
+      .groupBy(Constants.MovieIdColumn)
+      .agg(
+        collect_set(lower(col(Constants.TagColumn))).as(Constants.TagColumn)
+      )
+      .join(df2,Seq(Constants.MovieIdColumn),Constants.OuterJoin)
+  }
 
   def runProcess(): Unit = {
     dataFlow(Constants.MovieLensTagDf).printSchema()
@@ -253,6 +284,14 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     dataFlow(Constants.Rule8).show(30,false)
     val t1 = System.nanoTime()
     println("Elapsed time: " + (t1 - t0)/10e8 + "s")
+
+    dataFlow.put(Constants.RuleN1,ruleN1(dataFlow(Constants.MovieLensRatingDf)))
+    dataFlow(Constants.RuleN1).show()
+    dataFlow.put(Constants.RuleN2,ruleN2(dataFlow(Constants.MovieLensRatingDf),dataFlow(Constants.MovieLensMovieDf)))
+    dataFlow(Constants.RuleN2).show()
+    dataFlow.put(Constants.RuleN3,ruleN3(dataFlow(Constants.MovieLensTagDf),dataFlow(Constants.MovieLensMovieDf)))
+    dataFlow(Constants.RuleN3).printSchema()
+    dataFlow(Constants.RuleN3).show(false)
 
   }
 }

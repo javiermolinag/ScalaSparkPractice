@@ -2,7 +2,7 @@ package dataframe
 
 import common.Schemas.{movieMovieLensSchema, ratingMovieLensSchema, tagMovieLensSchema}
 import constants.Constants
-import org.apache.spark.sql.functions.{broadcast, col, explode, lit, ltrim, regexp_extract, rtrim, split, substring_index, sum}
+import org.apache.spark.sql.functions.{col, explode, avg, ltrim, regexp_extract, rtrim, split, substring_index, sum}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 import scala.collection.mutable
@@ -155,7 +155,8 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     Finally, filter the top 50 recommendations, the final data frame should contains the columns "title" and "recommendation"
     Use: Broadcast
   */
-  def rule8(df1: DataFrame, df2: DataFrame, df3: DataFrame): DataFrame = {
+  def rule8(df1: DataFrame, df2: DataFrame, df3: DataFrame, df4: DataFrame): DataFrame = {
+    // https://www.kaggle.com/rabiaakt/recommender-systems
     // def singleWeight(colName: String):Double = broadcast(df2).select(col(colName)).collect()(0).getDouble(0)
     val mapWeight = spark.sparkContext.broadcast(   // FASTEST !!!!!
       df2
@@ -163,6 +164,12 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
         .getValuesMap[Double](df2.schema.fieldNames)
     )
     def singleWeight(colName: String):Double = mapWeight.value(colName)
+
+    val ratingDf = df4
+      .groupBy(col(Constants.MovieIdColumn))
+      .agg(
+        avg(col(Constants.RatingColumn)).as(Constants.AvgRatingColumn)
+      )
 
     val df = df1
       .select(df1.columns.map(colName => {
@@ -187,8 +194,16 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       )
     df
       .join(df3,Seq(Constants.MovieIdColumn),Constants.InnerJoin)
+      .join(ratingDf,Seq(Constants.MovieIdColumn),Constants.OuterJoin)
+      .na
+      .fill(Map(
+        Constants.AvgRatingColumn -> 0
+      ))
       .drop(col(Constants.MovieIdColumn))
-      .orderBy(col(Constants.RecommendationColumn).desc_nulls_first)
+      .orderBy(
+        col(Constants.RecommendationColumn).desc_nulls_first,
+        col(Constants.AvgRatingColumn).desc_nulls_first
+      )
   }
 
   /*
@@ -220,28 +235,21 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     dataFlow(Constants.MovieLensMovieDf).show(5)
 
     dataFlow.put(Constants.Rule1,rule1(dataFlow(Constants.MovieLensMovieDf)))
-
     // Due to some movies have the same name and only differs by the year (for example "sabrina"),
     // we do not use this rule
     // dataFlow.put(Constants.Rule2,rule2(dataFlow(Constants.Rule1)))
-
     dataFlow.put(Constants.Rule3,rule3(dataFlow(Constants.Rule1)))
-    println(dataFlow(Constants.Rule3).count())
-    dataFlow(Constants.Rule3).printSchema()
-
+    // println(dataFlow(Constants.Rule3).count())
+    // dataFlow(Constants.Rule3).printSchema()
     dataFlow.put(Constants.Rule4,rule4(dataFlow(Constants.Rule3)))
-    dataFlow(Constants.Rule4).show()
-
+    // dataFlow(Constants.Rule4).show()
     dataFlow.put(Constants.Rule5,rule5())
-
     dataFlow.put(Constants.Rule6,rule6(dataFlow(Constants.Rule3), dataFlow(Constants.Rule5)))
-    dataFlow(Constants.Rule6).show()
-
+    // dataFlow(Constants.Rule6).show()
     dataFlow.put(Constants.Rule7,rule7(dataFlow(Constants.Rule4), dataFlow(Constants.Rule6)))
-    dataFlow(Constants.Rule7).show()
-
+    // dataFlow(Constants.Rule7).show()
     val t0 = System.nanoTime()
-    dataFlow.put(Constants.Rule8,rule8(dataFlow(Constants.Rule4), dataFlow(Constants.Rule7), dataFlow(Constants.MovieLensMovieDf)))
+    dataFlow.put(Constants.Rule8,rule8(dataFlow(Constants.Rule4), dataFlow(Constants.Rule7), dataFlow(Constants.MovieLensMovieDf), dataFlow(Constants.MovieLensRatingDf)))
     dataFlow(Constants.Rule8).show(30,false)
     val t1 = System.nanoTime()
     println("Elapsed time: " + (t1 - t0)/10e8 + "s")

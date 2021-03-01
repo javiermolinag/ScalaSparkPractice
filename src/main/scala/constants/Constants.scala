@@ -7,6 +7,7 @@ object Constants {
   val MovieLensTagPath: String = "/movie-lens/tag.csv"
 
   val InnerJoin: String = "inner"
+  val OuterJoin: String = "outer"
 
   val Rule1: String = "Rule1"
   val Rule2: String = "Rule2"
@@ -16,8 +17,10 @@ object Constants {
   val Rule6: String = "Rule6"
   val Rule7: String = "Rule7"
   val Rule8: String = "Rule8"
-  val Rule9: String = "Rule9"
-  val Rule10: String = "Rule10"
+  val RuleN1: String = "RuleN1"
+  val RuleN2: String = "RuleN2"
+  val RuleN3: String = "RuleN3"
+  val RuleN4: String = "RuleN4"
 
   val SpotifyDataDF: String = "spotifyDataDf"
   val MovieLensMovieDf: String = "movieLensMovieDf"
@@ -55,4 +58,6 @@ object Constants {
   val GenresColumn: String = "genres"
   val MovieIdColumn: String = "movieId"
   val RatingColumn: String = "rating"
+
+  val AvgRatingColumn: String = "avg_rating"
 }

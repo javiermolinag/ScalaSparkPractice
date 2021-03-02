@@ -244,7 +244,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
   }
 
   /*
-  todo: Rule n4
+  todo: Rule n3
     Show all different tags (array of strings) for each movie in a column called "tag"
     Use: groupBy, agg, collect_set, lower, join
   */

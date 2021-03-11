@@ -1,6 +1,8 @@
 package constants
 
 object Constants {
+  val sourcePath: String = "src/main/resources/data/csv/spotify/"
+
   val SpotifyDataPath: String = "/spotify/data_.csv"
   val MovieLensMoviePath: String = "/movie-lens/movie.csv"
   val MovieLensRatingPath: String = "/movie-lens/rating.csv"

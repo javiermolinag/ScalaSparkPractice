@@ -29,6 +29,8 @@ object Constants {
   val MovieLensTagDf: String = "movieLensTagDf"
 
   val ZeroDotEightFiveNumber: Double = 0.85
+  val TenNumber: Int = 10
+  val NineteenNUmber: Int = 19
   val TwentyNUmber: Int = 20
   val FiveNumber: Int = 5
   val ZeroNumber: Int = 0

@@ -1,11 +1,8 @@
 package rdd
 
 import constants.Constants
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-
-import javax.swing.JToolBar.Separator
 
 trait ReadProcessRDD {
 

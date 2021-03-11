@@ -1,4 +1,3 @@
-import dataframe.ProcMovieLensDataFrame
 import rdd.ProcSpotifyRDD
 import utils.initSpark
 

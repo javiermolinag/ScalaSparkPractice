@@ -1,7 +1,7 @@
 package constants
 
 object Constants {
-  val sourcePath: String = "src/main/resources/data/csv/spotify/"
+  val sourcePath: String = "src/main/resources/data/csv/"
 
   val SpotifyDataPath: String = "/spotify/data_.csv"
   val MovieLensMoviePath: String = "/movie-lens/movie.csv"
@@ -63,8 +63,12 @@ object Constants {
   val RatingColumn: String = "rating"
   val UserIdColumn: String = "userId"
   val TagColumn: String = "tag"
+  val TimestampColumn: String = "timestamp"
 
   val AvgRatingColumn: String = "avg_rating"
   val CountMovies: String = "count_movies"
   val CountUsers: String = "count_users"
+
+  val TimestampTagColumn: String = "timestampTag"
+  val TimestampRatingColumn: String = "timestampRating"
 }

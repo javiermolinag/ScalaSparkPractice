@@ -20,4 +20,11 @@ class WriteProcess {
       .mode(SaveMode.Overwrite)
       .save(s"src/main/resources/data/avro/$name")
   }
+  def writeCSV(df: DataFrame, name: String): Unit = {
+    df.write
+      .format("csv")
+      .mode(SaveMode.Overwrite)
+      // .option("header","true")
+      .save(s"src/main/resources/data/csv/movie-lens/$name")
+  }
 }

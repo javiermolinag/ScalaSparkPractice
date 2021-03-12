@@ -60,7 +60,6 @@ class ProcSpotifyRDD(spark: SparkSession) extends RDDCaseClass with ReadProcessR
   todo: Rule4
     Average of danceability by artist
   */
-  case class GroupAvgDanceability(artist: String, average: Double, count: Long)
 
   def danceabilityByArtist(rddSpotify: RDD[SpotifyData]): RDD[GroupAvgDanceability] = {
     val toRemove = "\"'[]{}".toSet
@@ -90,7 +89,7 @@ class ProcSpotifyRDD(spark: SparkSession) extends RDDCaseClass with ReadProcessR
   }
 
   def runProcess(): Unit = {
-    val fileName: String =  "data_.csv"
+    val fileName: String =  "spotify/data_.csv"
     val spotifyRegistry: String = "[0-9]*[.]?[0-9]*(e-[0-9]*)*,?"  // You can use a complex regex expr
     val rdd: RDD[Array[String]] = ReadFromFileCSV(spark, fileName, ",")
 
@@ -106,8 +105,7 @@ class ProcSpotifyRDD(spark: SparkSession) extends RDDCaseClass with ReadProcessR
     songsNumberByFirstLetterArtist(spotifyRDD)
       // .foreach(println(_))
     danceabilityByArtist(spotifyRDD)
-      // .foreach(println(_))
-
+      .foreach(println(_))
   }
 
 }

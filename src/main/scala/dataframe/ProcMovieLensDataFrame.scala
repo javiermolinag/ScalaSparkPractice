@@ -10,6 +10,7 @@ import scala.collection.mutable
 class ProcMovieLensDataFrame(spark: SparkSession) {
 
   private val readSpark = new ReadProcess(spark)
+  private val writeSpark = new WriteProcess
 
   val dataFlow: mutable.Map[String, DataFrame] = mutable.Map(
     Constants.MovieLensMovieDf -> readSpark.readCSV(Constants.MovieLensMoviePath,movieMovieLensSchema),
@@ -257,6 +258,38 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       .join(df2,Seq(Constants.MovieIdColumn),Constants.OuterJoin)
   }
 
+  /*
+  todo: Rule n3
+    Join the tag.csv, movie.csv and rating.csv and save it as movieLens.csv
+  */
+  def JoinAndWriteAll(): Unit = {
+    val moviesDf: DataFrame = dataFlow(Constants.MovieLensMovieDf)
+    val ratingDf: DataFrame = dataFlow(Constants.MovieLensRatingDf)
+    val tagDf: DataFrame = dataFlow(Constants.MovieLensTagDf)
+    val renameTimestamp = (df: DataFrame, newColName: String) => {
+      df.select(df.columns.map(colName => {
+        colName match {
+          case Constants.TimestampColumn => col(Constants.TimestampColumn).alias(newColName)
+          case _ => col(colName)
+        }
+      }):_*)
+    }
+
+    writeSpark.writeCSV(
+      moviesDf
+        .join(
+          renameTimestamp(ratingDf,Constants.TimestampRatingColumn),
+          Seq(Constants.MovieIdColumn),
+          Constants.OuterJoin)
+        .join(
+          renameTimestamp(tagDf,Constants.TimestampTagColumn),
+          Seq(Constants.UserIdColumn, Constants.MovieIdColumn),
+          Constants.OuterJoin),
+      "movieLens"
+    )
+
+  }
+
   def runProcess(): Unit = {
     dataFlow(Constants.MovieLensTagDf).printSchema()
     dataFlow(Constants.MovieLensTagDf).show(5)
@@ -292,6 +325,8 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     dataFlow.put(Constants.RuleN3,ruleN3(dataFlow(Constants.MovieLensTagDf),dataFlow(Constants.MovieLensMovieDf)))
     dataFlow(Constants.RuleN3).printSchema()
     dataFlow(Constants.RuleN3).show(false)
+
+    JoinAndWriteAll()
 
   }
 }

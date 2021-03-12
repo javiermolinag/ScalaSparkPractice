@@ -1,5 +1,6 @@
 package common
 
+import constants.Constants.TrueBoolean
 import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType, StringType, StructField, StructType}
 
 object Schemas {
@@ -27,23 +28,23 @@ object Schemas {
   ))
 
   val movieMovieLensSchema : StructType = StructType(Array(
-    StructField("movieId",StringType),
-    StructField("title",StringType),
-    StructField("genres",StringType)
+    StructField("movieId",StringType,TrueBoolean),
+    StructField("title",StringType,TrueBoolean),
+    StructField("genres",StringType,TrueBoolean)
   ))
 
   val ratingMovieLensSchema : StructType = StructType(Array(
-    StructField("userId",LongType),
-    StructField("movieId",StringType),
-    StructField("rating",StringType),
-    StructField("timestamp",StringType)
+    StructField("userId",LongType,TrueBoolean),
+    StructField("movieId",StringType,TrueBoolean),
+    StructField("rating",StringType,TrueBoolean),
+    StructField("timestamp",StringType,TrueBoolean)
   ))
 
   val tagMovieLensSchema : StructType = StructType(Array(
-    StructField("userId",LongType),
-    StructField("movieId",LongType),
-    StructField("tag",StringType),
-    StructField("timestamp",StringType)
+    StructField("userId",LongType,TrueBoolean),
+    StructField("movieId",LongType,TrueBoolean),
+    StructField("tag",StringType,TrueBoolean),
+    StructField("timestamp",StringType,TrueBoolean)
   ))
 
 

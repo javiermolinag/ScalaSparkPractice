@@ -10,7 +10,7 @@ class ReadProcess(spark: SparkSession) {
       .format("csv")
       .option("header","true")
       .option("sep",",")
-      .option("mode", "failFast") // dropMalformed, permissive (default) failFast
+      .option("mode", "permissive") // dropMalformed, permissive (default) failFast
       .schema(schema)
       .load(s"src/main/resources/data/csv/$name")
     df

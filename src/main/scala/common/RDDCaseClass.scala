@@ -15,4 +15,5 @@ trait RDDCaseClass {
         cols(17).toDouble,cols(18))
     }
   }
+  case class GroupAvgDanceability(artist: String, average: Double, count: Long)
 }

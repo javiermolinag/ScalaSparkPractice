@@ -6,9 +6,14 @@ import org.apache.spark.sql.SparkSession
 
 trait ReadProcessRDD {
 
-  def ReadFromFileCSV(spark: SparkSession, name: String, separator: String): RDD[Array[String]] = {
+  def ReadFromFileCSV(
+                       spark: SparkSession, name: String, separator: String, transform: String => String = line => line
+                     ): RDD[Array[String]] = {
     val rdd: RDD[String] = spark.sparkContext.textFile(Constants.sourcePath + name)
-    rdd.map(line => line.split(separator))
+
+    rdd
+      .map(line => transform(line))
+      .map(line => line.split(separator))
   }
 
 }

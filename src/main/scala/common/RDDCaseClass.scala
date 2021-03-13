@@ -15,5 +15,19 @@ trait RDDCaseClass {
         cols(17).toDouble,cols(18))
     }
   }
-  case class GroupAvgDanceability(artist: String, average: Double, count: Long)
+  case class GroupAvgDanceability(
+                                   artist: String,
+                                   average: Double,
+                                   count: Long)
+
+  case class MovieLensData(
+                            userId: String,
+                            movieId: String,
+                            title: String,
+                            year: String,
+                            genres: List[String],
+                            rating: Double,
+                            timestampRating: String,
+                            tag: String,
+                            timestampTag: String)
 }

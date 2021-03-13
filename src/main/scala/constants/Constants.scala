@@ -33,6 +33,7 @@ object Constants {
   val NineteenNUmber: Int = 19
   val TwentyNUmber: Int = 20
   val FiveNumber: Int = 5
+  val OneNumber: Int = 1
   val ZeroNumber: Int = 0
   val TrueBoolean: Boolean = true
   val FalseBoolean: Boolean = false

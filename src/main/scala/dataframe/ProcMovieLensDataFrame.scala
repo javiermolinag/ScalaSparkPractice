@@ -35,7 +35,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     Use: substring_index, rtrim, ltrim
   */
   def rule2(df: DataFrame): DataFrame = {
-    val newCol: Column = substring_index(col(Constants.TitleColumn),"(",1)
+    val newCol: Column = substring_index(col(Constants.TitleColumn),"(",OneNumber)
       .alias(Constants.TitleColumn)
     df.select(df.columns.map(colName => {
       colName match {
@@ -127,7 +127,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     val IdsList = df2
       .select(col(Constants.MovieIdColumn))
       .collect()
-      .map(row => row.getString(0))
+      .map(row => row.getString(Constants.ZeroNumber))
       .toList
     val df = df1
       .filter(col(Constants.MovieIdColumn).isin(IdsList :_*))
@@ -161,7 +161,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     // def singleWeight(colName: String):Double = broadcast(df2).select(col(colName)).collect()(0).getDouble(0)
     val mapWeight = spark.sparkContext.broadcast(   // FASTEST !!!!!
       df2
-        .collect()(0)
+        .collect()(Constants.ZeroNumber)
         .getValuesMap[Double](df2.schema.fieldNames)
     )
     def singleWeight(colName: String):Double = mapWeight.value(colName)
@@ -198,7 +198,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       .join(ratingDf,Seq(Constants.MovieIdColumn),Constants.OuterJoin)
       .na
       .fill(Map(
-        Constants.AvgRatingColumn -> 0
+        Constants.AvgRatingColumn -> Constants.ZeroNumber
       ))
       .drop(col(Constants.MovieIdColumn))
       .orderBy(
@@ -236,7 +236,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       .join(df2, Seq(Constants.MovieIdColumn),Constants.OuterJoin)
       .na
       .fill(Map(
-        Constants.AvgRatingColumn -> 0
+        Constants.AvgRatingColumn -> Constants.ZeroNumber
       ))
       .orderBy(
         col(Constants.AvgRatingColumn).desc_nulls_first,
@@ -276,16 +276,26 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     }
 
     writeSpark.writeCSV(
-      moviesDf
-        .join(
-          renameTimestamp(ratingDf,Constants.TimestampRatingColumn),
-          Seq(Constants.MovieIdColumn),
-          Constants.OuterJoin)
+      renameTimestamp(ratingDf,Constants.TimestampRatingColumn)
         .join(
           renameTimestamp(tagDf,Constants.TimestampTagColumn),
           Seq(Constants.UserIdColumn, Constants.MovieIdColumn),
-          Constants.OuterJoin),
-      "movieLens"
+          Constants.OuterJoin)
+        .join(
+          moviesDf,
+          Seq(Constants.MovieIdColumn),
+          Constants.OuterJoin)
+      .select(
+        Constants.UserIdColumn,
+        Constants.MovieIdColumn,
+        Constants.TitleColumn,
+        Constants.GenresColumn,
+        Constants.RatingColumn,
+        Constants.TimestampRatingColumn,
+        Constants.TagColumn,
+        Constants.TimestampTagColumn
+      ),
+      Constants.MovieLensString
     )
 
   }

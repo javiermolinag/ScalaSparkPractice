@@ -34,15 +34,15 @@ object Schemas {
   ))
 
   val ratingMovieLensSchema : StructType = StructType(Array(
-    StructField("userId",LongType,TrueBoolean),
+    StructField("userId",StringType,TrueBoolean),
     StructField("movieId",StringType,TrueBoolean),
     StructField("rating",StringType,TrueBoolean),
     StructField("timestamp",StringType,TrueBoolean)
   ))
 
   val tagMovieLensSchema : StructType = StructType(Array(
-    StructField("userId",LongType,TrueBoolean),
-    StructField("movieId",LongType,TrueBoolean),
+    StructField("userId",StringType,TrueBoolean),
+    StructField("movieId",StringType,TrueBoolean),
     StructField("tag",StringType,TrueBoolean),
     StructField("timestamp",StringType,TrueBoolean)
   ))

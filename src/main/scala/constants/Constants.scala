@@ -11,6 +11,8 @@ object Constants {
   val InnerJoin: String = "inner"
   val OuterJoin: String = "outer"
 
+  val MovieLensString: String = "movieLens"
+
   val Rule1: String = "Rule1"
   val Rule2: String = "Rule2"
   val Rule3: String = "Rule3"
@@ -32,9 +34,17 @@ object Constants {
   val TenNumber: Int = 10
   val NineteenNUmber: Int = 19
   val TwentyNUmber: Int = 20
-  val FiveNumber: Int = 5
-  val OneNumber: Int = 1
+  val MinusOneNUmber: Int = -1
   val ZeroNumber: Int = 0
+  val OneNumber: Int = 1
+  val TwoNumber: Int = 2
+  val ThreeNumber: Int = 3
+  val FourNumber: Int = 4
+  val FiveNumber: Int = 5
+  val SixNumber: Int = 6
+  val SevenNumber: Int = 7
+  val EightNumber: Int = 8
+  val NineNumber: Int = 9
   val TrueBoolean: Boolean = true
   val FalseBoolean: Boolean = false
 
@@ -58,11 +68,11 @@ object Constants {
   val ArtistsColumn: String = "artists"
   val DanceabilityColumn: String = "danceability"
 
+  val UserIdColumn: String = "userId"
+  val MovieIdColumn: String = "movieId"
   val TitleColumn: String = "title"
   val GenresColumn: String = "genres"
-  val MovieIdColumn: String = "movieId"
   val RatingColumn: String = "rating"
-  val UserIdColumn: String = "userId"
   val TagColumn: String = "tag"
   val TimestampColumn: String = "timestamp"
 

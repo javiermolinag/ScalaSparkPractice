@@ -2,7 +2,8 @@ package dataframe
 
 import common.Schemas.{movieMovieLensSchema, ratingMovieLensSchema, tagMovieLensSchema}
 import constants.Constants
-import org.apache.spark.sql.functions.{avg, col, collect_set, count, explode, lower, ltrim, regexp_extract, rtrim, split, substring_index, sum}
+import org.apache.spark.sql.functions.{avg, col, collect_set, count, explode, lit, lower, ltrim, regexp_extract, regexp_replace, rtrim, split, substring_index, sum}
+import org.apache.spark.sql.types.{LongType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 import scala.collection.mutable
@@ -24,7 +25,14 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       Use: regexp_extract
   */
   def rule1(df: DataFrame): DataFrame = {
-    val newCol: Column = regexp_extract(col(Constants.TitleColumn),"([0-9]{4})",1)
+    val newCol: Column =
+      regexp_replace(
+        regexp_extract(
+          col(Constants.TitleColumn),
+          "[(][0-9]{4}[)] *$",
+          Constants.ZeroNumber),
+        "[() ]",
+        "")
       .alias(Constants.YearColumn)
     df.select(df.columns.map(col) :+ newCol :_*)
   }
@@ -35,7 +43,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     Use: substring_index, rtrim, ltrim
   */
   def rule2(df: DataFrame): DataFrame = {
-    val newCol: Column = substring_index(col(Constants.TitleColumn),"(",OneNumber)
+    val newCol: Column = substring_index(col(Constants.TitleColumn),"(",Constants.OneNumber)
       .alias(Constants.TitleColumn)
     df.select(df.columns.map(colName => {
       colName match {
@@ -259,7 +267,7 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
   }
 
   /*
-  todo: Rule n3
+  todo: Join and save a single CSV
     Join the tag.csv, movie.csv and rating.csv and save it as movieLens.csv
   */
   def JoinAndWriteAll(): Unit = {
@@ -297,7 +305,46 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
       ),
       Constants.MovieLensString
     )
+  }
 
+  /*
+  todo: Check the RDD exercises
+  */
+  def checkRDDProcess(): Unit = {
+    def moviesByYearCheck(df: DataFrame): Unit = {
+      df
+        .groupBy(Constants.YearColumn)
+        .count()
+        .orderBy(col(Constants.YearColumn).desc_nulls_first)
+        // .show(1000)
+    }
+    def NumberOfMovies(df: DataFrame): Unit = {
+      println(
+        df
+          .dropDuplicates(Seq(Constants.MovieIdColumn))
+          .count()
+      )
+    }
+    def bestMovies(df: DataFrame): Unit = {
+      df
+        .groupBy(col(Constants.MovieIdColumn))
+        .agg(
+          avg(col(Constants.RatingColumn))
+            .alias(Constants.AvgRatingColumn),
+          count(col(Constants.RatingColumn))
+            .alias(Constants.CountMovies)
+        )
+        .filter(col(Constants.AvgRatingColumn) > Constants.FourDotFIveNumber)
+        .sort(col(Constants.MovieIdColumn).cast(LongType).desc_nulls_first)
+        .show(200,Constants.FalseBoolean)
+    }
+
+    // Number of movies
+    NumberOfMovies(dataFlow(Constants.MovieLensMovieDf))
+    // Movies by year
+    moviesByYearCheck(rule1(dataFlow(Constants.MovieLensMovieDf)))
+    // bestMovies
+    bestMovies(dataFlow(Constants.MovieLensRatingDf))
   }
 
   def runProcess(): Unit = {
@@ -337,6 +384,5 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     dataFlow(Constants.RuleN3).show(false)
 
     JoinAndWriteAll()
-
   }
 }

@@ -34,6 +34,7 @@ object Constants {
   val TenNumber: Int = 10
   val NineteenNUmber: Int = 19
   val TwentyNUmber: Int = 20
+  val FourDotFIveNumber: Double = 4.5
   val MinusOneNUmber: Int = -1
   val ZeroNumber: Int = 0
   val OneNumber: Int = 1

@@ -6,5 +6,6 @@ object mainDataframe extends initSpark{
   // procDataFrame.runProcess()
 
   val procDataFrame: ProcMovieLensDataFrame = new ProcMovieLensDataFrame(spark)
-  procDataFrame.runProcess()
+  // procDataFrame.runProcess()
+  procDataFrame.checkRDDProcess()
 }

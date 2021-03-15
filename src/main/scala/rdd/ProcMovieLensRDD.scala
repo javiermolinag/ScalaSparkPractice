@@ -127,6 +127,34 @@ class ProcMovieLensRDD(spark: SparkSession) extends RDDCaseClass with ReadProces
       .foreach(println(_))
   }
 
+  /*
+  todo: Rule4
+    Show the best movies (avg rating > 4.5) by each genre
+  */
+  private def bestMoviesByGenre(movieLensRDD: RDD[MovieLensData]): Unit = {
+    movieLensRDD
+      .filter(rdd => rdd.rating != -1)
+      .map(rdd => ((rdd.movieId, rdd.userId, rdd.rating), rdd.genres))
+      .flatMapValues(values => values)
+      .map{
+        case((movieId, userId, rating), genres) =>
+          ((movieId, userId, rating, genres), OneNumber) }
+      .partitionBy(new HashPartitioner(20))
+      .reduceByKey(_ + _)
+      .map {
+        case ((movieId, _, rating, genres), _) =>
+          ((movieId, genres), (OneNumber, rating))}
+      .reduceByKey((a,b) => (a._1 + b._1, a._2 + b._2))
+      .map {
+        case ((movieId, genres), (count, sum)) =>
+          (movieId, genres, sum/count, count)}
+      .filter(item => item._3 > FourDotFIveNumber)
+      .coalesce(1)
+      .sortBy(item => item._1.toLong, FalseBoolean)
+      .foreach(println(_))
+  }
+
+
   def runProcess(): Unit = {
     val fileName: String =  "movie-lens/movieLens/*.csv"
     val movieLensRDD: RDD[MovieLensData] = loadData(fileName)
@@ -141,8 +169,10 @@ class ProcMovieLensRDD(spark: SparkSession) extends RDDCaseClass with ReadProces
     // bestMovies(movieLensRDD)
     // bestMoviesFast(movieLensRDD)
 
+    // bestMoviesByGenre
+
     val t0 = System.nanoTime()
-    bestMoviesFast(movieLensRDD)
+    bestMoviesByGenre(movieLensRDD)
     val t1 = System.nanoTime()
     println("Elapsed time: " + (t1 - t0)/10e8 + "s")
 

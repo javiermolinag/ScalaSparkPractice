@@ -336,6 +336,32 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
         )
         .filter(col(Constants.AvgRatingColumn) > Constants.FourDotFIveNumber)
         .sort(col(Constants.MovieIdColumn).cast(LongType).desc_nulls_first)
+        //.show(200,Constants.FalseBoolean)
+    }
+    val explodeGenres: DataFrame => DataFrame = {
+      df =>
+        val newCol: Column = explode(split(col(Constants.GenresColumn),"\\|"))
+          .alias(Constants.GenresColumn)
+        df.select(df.columns.map( colName => {
+          colName match {
+            case Constants.GenresColumn => newCol
+            case _ => col(colName)
+          }
+        }) :_*)
+    }
+    def bestMoviesByGenre(df1: DataFrame, df2: DataFrame): Unit = {
+      df1
+        .join(df2,Seq(Constants.MovieIdColumn))
+        .transform(explodeGenres)
+        .groupBy(col(Constants.MovieIdColumn),col(Constants.GenresColumn))
+        .agg(
+          avg(col(Constants.RatingColumn))
+            .alias(Constants.AvgRatingColumn),
+          count(col(Constants.RatingColumn))
+            .alias(Constants.CountMovies)
+        )
+        .filter(col(Constants.AvgRatingColumn) > Constants.FourDotFIveNumber)
+        .sort(col(Constants.MovieIdColumn).cast(LongType).desc_nulls_first)
         .show(200,Constants.FalseBoolean)
     }
 
@@ -343,8 +369,10 @@ class ProcMovieLensDataFrame(spark: SparkSession) {
     NumberOfMovies(dataFlow(Constants.MovieLensMovieDf))
     // Movies by year
     moviesByYearCheck(rule1(dataFlow(Constants.MovieLensMovieDf)))
-    // bestMovies
+    // best movies
     bestMovies(dataFlow(Constants.MovieLensRatingDf))
+    // best movies by gene
+    bestMoviesByGenre(dataFlow(Constants.MovieLensRatingDf),dataFlow(Constants.MovieLensMovieDf))
   }
 
   def runProcess(): Unit = {
